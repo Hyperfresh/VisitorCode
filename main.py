@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+# This runs on Git!
+# Created using Visual Studio Code.
+# Repl.it is running Python through BASH. See the .replit file.
+
 # Paul Asencion (Hy~) 11JHAR
 # Planning and programming a visitor register
 # Concordia College | SACE 740975X

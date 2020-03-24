@@ -14,6 +14,39 @@ from termcolor import colored
 import time
 import datetime
 import getpass
+import os
+import platform
+import ctypes
+
+# Start up.
+def UpdateTime():
+    global CurrentTime
+    CurrentTime = (time.strftime("%d %b %Y %H:%M:%S", time.localtime()))
+
+print("")
+UpdateTime()
+print("Concordia College Visitor Application")
+print(CurrentTime)
+print(os.name + " " + platform.system() + " " + platform.release())
+print("")
+
+if os.name == "posix": # Because the keyboard library requires su on Unix, this code checks
+    def isAdmin():
+        try:
+            is_admin = (os.getuid() == 0)
+        except AttributeError:
+            is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+        return is_admin
+
+if isAdmin():
+    print(colored("It seems you're running this application on a Unix device. Some things may not work properly.","yellow"))
+else:
+    print(colored("You are running this application on a Unix device without su privileges. Please run this application with su.","red"))
+    exit()
+
+print("\nLoading...")
+time.sleep(5)
+print("")
 
 # Variable declaration
 name = ""
@@ -24,10 +57,6 @@ pincheck = 0
 sign = False
 reset = False
 CurrentTime = ""
-
-def UpdateTime():
-    global CurrentTime
-    CurrentTime = (time.strftime("%d %b %Y %H:%M:%S", time.localtime()))
 
 # Big ASCII stuff
 logo = """       ! `c `_                                                                                           
@@ -124,6 +153,18 @@ def Visitor():
         print("You have been signed in. Please remember your PIN.")
     time.sleep(5)
     UI()
+
+# Contractor module
+def Contractor()
+    global NumberToCheck
+    global name
+    global phone
+    global pin
+    global pincheck
+    global sign
+    global CurrentTime
+    NumCheck("Enter your phone number.")
+    
     
 # User interface module
 def UI():
@@ -133,6 +174,8 @@ def UI():
         try:
             if keyboard.is_pressed('1'):
                 Visitor()
+            if keyboard.is_pressed('2'):
+                Contractor()
         except:
             break
 

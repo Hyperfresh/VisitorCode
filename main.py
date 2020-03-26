@@ -9,14 +9,14 @@
 # Concordia College | SACE 740975X
 
 # Library importing
-import keyboard
-from termcolor import colored
-import time
-import datetime
-import getpass
-import os
-import platform
-import ctypes
+import keyboard # Library checks for keystrokes. THIS MAY NOT BE INSTALLED
+from termcolor import colored # Colored terminal output. THIS MAY NOT BE INSTALLED
+import time # Time module for sleep and retrival of current time.
+import getpass # PIN module.
+import os # Get OS details and run clearscreen.
+import platform # Get OS details.
+import ctypes # Get admin details.
+from pathlib import Path # Check for existing file.
 
 # Start up.
 def UpdateTime():
@@ -30,23 +30,56 @@ print(CurrentTime)
 print(os.name + " " + platform.system() + " " + platform.release())
 print("")
 
-if os.name == "posix": # Because the keyboard library requires su on Unix, this code checks
-    def isAdmin():
+def clear():
+    if os.name == "posix":
+        os.system('clear')
+    else:
+        os.system('cls')
+
+if os.name == "posix": # Because the keyboard library requires su on Unix, this code checks    
+    def isAdmin(): # su check module
         try:
             is_admin = (os.getuid() == 0)
         except AttributeError:
             is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
         return is_admin
 
-if isAdmin():
-    print(colored("It seems you're running this application on a Unix device. Some things may not work properly.","yellow"))
-else:
-    print(colored("You are running this application on a Unix device without su privileges. Please run this application with su.","red"))
-    exit()
+    if isAdmin():
+        print(colored("You are running this application on a Unix device. Some things may not work properly.","yellow"))
+        print("")
+    else:
+        print(colored("You are running this application on a Unix device without su privileges. Please run this application with su.","red"))
+        exit()
 
-print("\nLoading...")
+def checkfile(): # if database already exists
+    global option
+    my_file = Path("database.txt")
+    if my_file.is_file():
+        file1 = open('database.txt','r')
+        print("It looks like there's an existing database. The data as follows:")
+        alist = file1.read().splitlines()
+        print(colored("Name, Phone, PIN, Sign-in status, Timestamp","cyan"))
+        print(alist)
+        print("\nWhat do you want to do? You can either clear the database or write to the existing database.")
+        def chooseoption():
+            global option
+            print(colored("For verification purposes, please enter 'clear' or 'write'.","yellow"))
+            option = input(colored("WARNING: ","red") + "Clearing the database cannot be undone. > ")
+            if option == "clear":
+                os.remove("database.txt")
+                print(colored("File cleared.\n","green"))
+            elif option != "write":
+                print(colored("Sorry, please try that again.","red"))
+                chooseoption()
+            else:
+                print(colored("Writing to existing file.\n","green"))
+        chooseoption()
+checkfile()
+
+print("Loading...")
 time.sleep(5)
 print("")
+clear()
 
 # Variable declaration
 name = ""
@@ -155,7 +188,7 @@ def Visitor():
     UI()
 
 # Contractor module
-def Contractor()
+def Contractor():
     global NumberToCheck
     global name
     global phone
@@ -169,6 +202,8 @@ def Contractor()
 # User interface module
 def UI():
     print(logo)
+    UpdateTime()
+    print("\nToday is " + CurrentTime + ".")
     print(options)
     while True:
         try:
@@ -176,6 +211,9 @@ def UI():
                 Visitor()
             if keyboard.is_pressed('2'):
                 Contractor()
+            if keyboard.is_pressed('esc'):
+                print(colored("Escape pressed. Exiting...","yellow"))
+                exit()
         except:
             break
 

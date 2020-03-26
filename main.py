@@ -76,6 +76,24 @@ def checkfile(): # if database already exists
         chooseoption()
 checkfile()
 
+def pinchecker():
+    global pin
+    global pincheck
+    try:
+        pin = int(getpass.getpass("Please enter a PIN. > "))
+        pincheck = int(getpass.getpass("Enter it again      > "))
+        if pincheck != pin:
+            print(colored("Sorry, the PINs you entered didn't match.","red"))
+            pinchecker()
+    except:
+        print(colored("Sorry, please try that again.","red"))
+        pinchecker()
+
+print("You are about to set an Administration PIN.\nRemember it as you will need it to view the database\nand close the application.")
+pinchecker()
+AdminPIN = pin
+
+print("Okay, now that's set. You won't see it on the UI as it's meant to be unattended -\npress [Escape] to close the application, and [?] to view the database.")
 print("Loading...")
 time.sleep(5)
 print("")
@@ -158,18 +176,6 @@ def Visitor():
         except:
             break  # if user pressed a key other than the given key the loop will break
     print(colored("You are about to set a PIN. It must be numeric and cannot start with 0.","yellow"))
-    def pinchecker():
-        global pin
-        global pincheck
-        try:
-            pin = int(getpass.getpass("Please enter a PIN. > "))
-            pincheck = int(getpass.getpass("Enter it again      > "))
-            if pincheck != pin:
-                print(colored("Sorry, the PINs you entered didn't match.","red"))
-                pinchecker()
-        except:
-            print(colored("Sorry, please try that again.","red"))
-            pinchecker()
     pinchecker()
     if reset == False:
         sign = True
@@ -212,7 +218,8 @@ def UI():
             if keyboard.is_pressed('2'):
                 Contractor()
             if keyboard.is_pressed('esc'):
-                print(colored("Escape pressed. Exiting...","yellow"))
+                print(colored("Escape pressed. Please enter Administration PIN.","yellow"))
+                
                 exit()
         except:
             break

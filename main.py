@@ -86,19 +86,23 @@ def pinchecker():
     global pincheck
     try:
         pin = int(getpass.getpass("Please enter a PIN. > "))
-        pincheck = int(getpass.getpass("Enter it again      > "))
+        pincheck = int(getpass.getpass("Enter the PIN again > "))
         if pincheck != pin:
             print(colored("Sorry, the PINs you entered didn't match.","red"))
             pinchecker()
     except:
         print(colored("Sorry, please try that again.","red"))
         pinchecker()
+    
+    if len(str(pincheck)) != 4:
+        print(colored("Your PIN must be exactly 4 numbers long.","red"))
+        pinchecker()
 
 print("You are about to set an Administration PIN.\nRemember it as you will need it to view the database\nand close the application.")
 pinchecker()
 AdminPIN = pin
 
-print("Okay, now that's set. You won't see it on the UI as it's meant to be unattended -\npress [Escape] to close the application, and [?] to view the database.")
+print("\nOkay, now that's set. You won't see it on the UI as it's meant to be unattended -\npress [Escape] to close the application, and [?] to view the database.\n")
 print("Loading...")
 time.sleep(5)
 print("")
@@ -150,6 +154,10 @@ def NumCheck(Prompt):
         print(colored("Sorry, please try that again.","red"))
         NumCheck(Prompt)
 
+    if len(NumberToCheck) != 9:
+        print(colored("A phone number should have nine digits, excluding the 0 at the beginning.","red"))
+        NumCheck(Prompt)
+
 # PIN
 def pinput(admin):
     global userinput
@@ -160,6 +168,10 @@ def pinput(admin):
         except:
             print(colored("Sorry, please try that again.","red"))
             pinput(True)
+
+        if len(str(userinput)) != 4:
+            print(colored("Sorry, please try that again.","red"))
+            pinput(True)
         
         if userinput != AdminPIN:
             print(colored("Sorry, that PIN you entered is wrong.","red"))
@@ -168,6 +180,16 @@ def pinput(admin):
             correct = True
         
         return correct
+    else:
+        try:
+            userinput = int(getpass.getpass("> "))
+        except:
+            print(colored("Sorry, please try that again.","red"))
+            pinput(False)
+
+        if len(str(userinput)) != 4:
+            print(colored("Sorry, please try that again.","red"))
+            pinput(True)
 
 
 # Visitor module
@@ -226,6 +248,25 @@ def Contractor():
     global sign
     global CurrentTime
     NumCheck("Enter your phone number.")
+    searchfile = open("database.txt", "r")
+    for line in searchfile:
+        if str(NumberToCheck) in line:
+            print("Entry found, please enter your PIN.")
+            pinput(False)
+            if str(", " + userinput + ", ") in line:
+                sign = True
+                UpdateTime()
+                lines = open('database.txt').read().splitlines()
+                lines[line] = str(name + ', ' + phone + ', ' + pin + ', ' + sign + ', ' + CurrentTime + " \n")
+                open('database_mod.txt','w').write('\n'.join(lines))
+                file2 = open('database.txt','w')
+                file2.close
+                os.rename('database_mod.txt', 'database.txt')
+                print("Thank you, " + str(name) + ".\nYou have been signed in.")
+
+
+
+    searchfile.close()
     
     
 # User interface module
@@ -275,7 +316,8 @@ def UI():
                     time.sleep(3)
                     UI()
 
-        except:
+        except: #Exception as e:
+            #print(e)
             break
 
 # And this is the thing that calls it. Pretty boring I know.

@@ -57,25 +57,27 @@ def checkfile(): # if database already exists
     my_file = Path("database.txt")
     if my_file.is_file():
         file1 = open('database.txt','r')
-        print("It looks like there's an existing database. The data as follows:")
         alist = file1.read().splitlines()
-        print(colored("Name, Phone, PIN, Sign-in status, Timestamp","cyan"))
-        print(alist)
-        file1.close #close file
-        print("\nWhat do you want to do? You can either clear the database or write to the existing database.")
-        def chooseoption():
-            global option
-            print(colored("For verification purposes, please enter 'clear' or 'write'.","yellow"))
-            option = input(colored("WARNING: ","red") + "Clearing the database cannot be undone. > ")
-            if option == "clear":
-                os.remove("database.txt")
-                print(colored("File cleared.\n","green"))
-            elif option != "write":
-                print(colored("Sorry, please try that again.","red"))
-                chooseoption()
-            else:
-                print(colored("Writing to existing file.\n","green"))
-        chooseoption() #call to choose option
+        if alist != []:
+            print("It looks like there's exisitng data in the database:")
+            print(colored("Name, Phone, PIN, Sign-in status, Timestamp","cyan"))
+            print(alist)
+            file1.close #close file
+            print("\nWhat do you want to do? You can either clear the database or write to the existing database.")
+            def chooseoption():
+                global option
+                print(colored("For verification purposes, please enter 'clear' or 'write'.","yellow"))
+                option = input(colored("WARNING: ","red") + "Clearing the database cannot be undone. > ")
+                if option == "clear":
+                    file2 = open('database.txt','w')
+                    file2.close
+                    print(colored("File cleared.\n","green"))
+                elif option != "write":
+                    print(colored("Sorry, please try that again.","red"))
+                    chooseoption()
+                else:
+                    print(colored("Writing to existing file.\n","green"))
+            chooseoption() #call to choose option
 checkfile() #call to check file
 
 
@@ -153,9 +155,8 @@ def pinput(admin):
     global userinput
     global AdminPIN
     if admin == True:
-        userinput = str((input("> ")))
         try:
-            userinput = int(userinput)
+            userinput = int(getpass.getpass("> "))
         except:
             print(colored("Sorry, please try that again.","red"))
             pinput(True)
@@ -169,7 +170,6 @@ def pinput(admin):
         return correct
 
 
-
 # Visitor module
 def Visitor():
     global NumberToCheck
@@ -179,6 +179,7 @@ def Visitor():
     global pincheck
     global sign
     global CurrentTime
+    global reset
     name = str(input("Please enter your name. > "))
     NumCheck("Enter your phone number.")
     phone = NumberToCheck
@@ -229,6 +230,7 @@ def Contractor():
     
 # User interface module
 def UI():
+    global reset
     clear()
     print(logo)
     UpdateTime()
@@ -240,25 +242,37 @@ def UI():
                 Visitor()
             if keyboard.is_pressed('2'):
                 Contractor()
+            if keyboard.is_pressed('3'):
+                SignOut()
+            if keyboard.is_pressed('4'):
+                reset = True
+                Visitor()
+
             if keyboard.is_pressed('esc'):
                 print(colored("Escape pressed. Please enter Administration PIN.","yellow"))
                 if pinput(True):
+                    print("Exiting...")
                     exit()
                 else:
+                    time.sleep(3)
                     UI()
             if keyboard.is_pressed('?'):
-                print(colored("Query pressed. Please enter Administration PIN.","yellow"))
+                print(colored("Query requested. Please enter Administration PIN.","yellow"))
                 if pinput(True):
                     file1 = open('database.txt','r')
                     alist = file1.read().splitlines()
-                    print(colored("Name, Phone, PIN, Sign-in status, Timestamp","cyan"))
-                    print(alist)
+                    if alist != []:
+                        print(colored("Name, Phone, PIN, Sign-in status, Timestamp","cyan"))
+                        print(alist)
+                    else:
+                        print(colored("It looks like the database is empty.","cyan"))
                     try:
-                        input("Press any key to return to UI.")
+                        input("Press the [Enter] key to return to UI.")
                     except:
                         UI()
                     UI()
                 else:
+                    time.sleep(3)
                     UI()
 
         except:

@@ -11,12 +11,16 @@
 # Library importing
 import keyboard # Library checks for keystrokes. THIS MAY NOT BE INSTALLED
 from termcolor import colored # Colored terminal output. THIS MAY NOT BE INSTALLED
-import time # Time module for sleep and retrival of current time.
+import time # Time module for sleep and retrieval of current time.
 import getpass # PIN module.
 import os # Get OS details and run clearscreen.
 import platform # Get OS details.
 import ctypes # Get admin details.
 from pathlib import Path # Check for existing file.
+
+# One of the liibraries above MAY NOT BE INSTALLED on your computer.
+# To fix this, run pip. On mac0S, assuming you have Python 3.7, run "pip3.7 install keyboard" etc. Sudo may be required.
+# On Windows, run "python -m pip install keyboard" etc.
 
 # Start-up code definitions
 def UpdateTime(): # A handy shortcut to update the Time variable
@@ -104,7 +108,7 @@ AdminPIN = pin
 
 print("\nOkay, now that's set. You won't see it on the UI as it's meant to be unattended -\npress [Escape] to close the application, and [?] to view the database.\n")
 print("Loading...")
-time.sleep(5)
+#time.sleep(5)
 print("")
 
 # Variable declaration
@@ -154,7 +158,7 @@ def NumCheck(Prompt):
         print(colored("Sorry, please try that again.","red"))
         NumCheck(Prompt)
 
-    if len(NumberToCheck) != 9:
+    if len(str(NumberToCheck)) != 9:
         print(colored("A phone number should have nine digits, excluding the 0 at the beginning.","red"))
         NumCheck(Prompt)
 
@@ -183,7 +187,8 @@ def pinput(admin):
     else:
         try:
             userinput = int(getpass.getpass("> "))
-        except:
+        except Exception as e:
+            print(e)
             print(colored("Sorry, please try that again.","red"))
             pinput(False)
 
@@ -206,9 +211,10 @@ def Visitor():
     NumCheck("Enter your phone number.")
     phone = NumberToCheck
     if reset == True:
-        # I could put in some code to check if the entry exists...
+        #code to check if number is in database
         print("Your entry " + str(name) + " with phone number 0" + str(phone) + " will be reset. Confirm?")
     else:
+        # code to check if number is in database
         print("An entry for " + str(name) + " with phone number 0" + str(phone) + " will be created. Confirm?")
     while True:  # making a loop
         try:  # used try so that if user pressed other than the given key error will not be shown
@@ -249,24 +255,33 @@ def Contractor():
     global CurrentTime
     NumCheck("Enter your phone number.")
     searchfile = open("database.txt", "r")
+    linenum = 0
     for line in searchfile:
+        linenum = linenum + 1
         if str(NumberToCheck) in line:
             print("Entry found, please enter your PIN.")
             pinput(False)
-            if str(", " + userinput + ", ") in line:
+            if (", " + str(userinput) + ", ") in line:
+                file1 = open('database.txt','r')
+                alist = file1.read().splitlines()
                 sign = True
                 UpdateTime()
                 lines = open('database.txt').read().splitlines()
-                lines[line] = str(name + ', ' + phone + ', ' + pin + ', ' + sign + ', ' + CurrentTime + " \n")
+                lines[linenum] = alist[1] + ', ' + alist[2] + ', ' + alist[3] + ', ' + sign + ', ' + CurrentTime + " \n"
                 open('database_mod.txt','w').write('\n'.join(lines))
                 file2 = open('database.txt','w')
                 file2.close
                 os.rename('database_mod.txt', 'database.txt')
                 print("Thank you, " + str(name) + ".\nYou have been signed in.")
-
-
-
+            else:
+                print("Returning to UI.")
+            searchfile.close()
+            time.sleep(5)
+            UI()
+    print(colored("The phone number you entered cannot be found in the database.","red") + " Returning to UI.")    
     searchfile.close()
+    time.sleep(5)
+    UI()
     
     
 # User interface module
@@ -316,8 +331,8 @@ def UI():
                     time.sleep(3)
                     UI()
 
-        except: #Exception as e:
-            #print(e)
+        except Exception as e:
+            print(e)
             break
 
 # And this is the thing that calls it. Pretty boring I know.

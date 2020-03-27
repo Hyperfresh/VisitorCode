@@ -18,23 +18,24 @@ import platform # Get OS details.
 import ctypes # Get admin details.
 from pathlib import Path # Check for existing file.
 
-# Start up.
-def UpdateTime():
+# Start-up code definitions
+def UpdateTime(): # A handy shortcut to update the Time variable
     global CurrentTime
     CurrentTime = (time.strftime("%d %b %Y %H:%M:%S", time.localtime()))
 
+def clear(): # Clear screen module. The command for clearing the screen in Posix is different to Windows.
+    if os.name == "posix":
+        os.system('clear')
+    else:
+        os.system('cls')
+
+# Start-up screen
 print("")
 UpdateTime()
 print("Concordia College Visitor Application")
 print(CurrentTime)
 print(os.name + " " + platform.system() + " " + platform.release())
 print("")
-
-def clear():
-    if os.name == "posix":
-        os.system('clear')
-    else:
-        os.system('cls')
 
 if os.name == "posix": # Because the keyboard library requires su on Unix, this code checks    
     def isAdmin(): # su check module
@@ -44,10 +45,10 @@ if os.name == "posix": # Because the keyboard library requires su on Unix, this 
             is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
         return is_admin
 
-    if isAdmin():
+    if isAdmin(): # Prints warning.
         print(colored("You are running this application on a Unix device. Some things may not work properly.","yellow"))
         print("")
-    else:
+    else: # Prints error and exits.
         print(colored("You are running this application on a Unix device without su privileges. Please run this application with su.","red"))
         exit()
 
@@ -60,6 +61,7 @@ def checkfile(): # if database already exists
         alist = file1.read().splitlines()
         print(colored("Name, Phone, PIN, Sign-in status, Timestamp","cyan"))
         print(alist)
+        file1.close #close file
         print("\nWhat do you want to do? You can either clear the database or write to the existing database.")
         def chooseoption():
             global option
@@ -73,8 +75,9 @@ def checkfile(): # if database already exists
                 chooseoption()
             else:
                 print(colored("Writing to existing file.\n","green"))
-        chooseoption()
-checkfile()
+        chooseoption() #call to choose option
+checkfile() #call to check file
+
 
 def pinchecker():
     global pin
@@ -97,7 +100,6 @@ print("Okay, now that's set. You won't see it on the UI as it's meant to be unat
 print("Loading...")
 time.sleep(5)
 print("")
-clear()
 
 # Variable declaration
 name = ""
@@ -147,6 +149,26 @@ def NumCheck(Prompt):
         NumCheck(Prompt)
 
 # PIN
+def pinput(admin):
+    global userinput
+    global AdminPIN
+    if admin == True:
+        userinput = str((input("> ")))
+        try:
+            userinput = int(userinput)
+        except:
+            print(colored("Sorry, please try that again.","red"))
+            pinput(True)
+        
+        if userinput != AdminPIN:
+            print(colored("Sorry, that PIN you entered is wrong.","red"))
+            correct = False
+        else:
+            correct = True
+        
+        return correct
+
+
 
 # Visitor module
 def Visitor():
@@ -207,6 +229,7 @@ def Contractor():
     
 # User interface module
 def UI():
+    clear()
     print(logo)
     UpdateTime()
     print("\nToday is " + CurrentTime + ".")
@@ -219,8 +242,25 @@ def UI():
                 Contractor()
             if keyboard.is_pressed('esc'):
                 print(colored("Escape pressed. Please enter Administration PIN.","yellow"))
-                
-                exit()
+                if pinput(True):
+                    exit()
+                else:
+                    UI()
+            if keyboard.is_pressed('?'):
+                print(colored("Query pressed. Please enter Administration PIN.","yellow"))
+                if pinput(True):
+                    file1 = open('database.txt','r')
+                    alist = file1.read().splitlines()
+                    print(colored("Name, Phone, PIN, Sign-in status, Timestamp","cyan"))
+                    print(alist)
+                    try:
+                        input("Press any key to return to UI.")
+                    except:
+                        UI()
+                    UI()
+                else:
+                    UI()
+
         except:
             break
 

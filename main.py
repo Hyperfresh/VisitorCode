@@ -16,7 +16,7 @@ import getpass # PIN module.
 import os # Get OS details and run clearscreen.
 import platform # Get OS details.
 import ctypes # Get admin details.
-from pathlib import Path # Check for existing file.
+from pathlib import Path # Check for existing file. THIS MAY NOT BE INSTALLED
 import csv # CSV is a bit of a mess, but...
 
 # One of the liibraries above MAY NOT BE INSTALLED on your computer.

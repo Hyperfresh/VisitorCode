@@ -130,14 +130,13 @@ def pinput(admin):
     else:
         try:
             userinput = int(getpass.getpass("> "))
-        except Exception as e:
-            print(e)
+        except:
             print(colored("Sorry, please try that again.","red"))
             pinput(False)
 
         if len(str(userinput)) != 4:
             print(colored("Sorry, please try that again.","red"))
-            pinput(True)
+            pinput(False)
 
 def write_cell(row, col, val): # Overwriting data. Thanks @GradyDal on Repl.it
 	with open('database.csv') as f:
@@ -168,10 +167,7 @@ print(os.name + " " + platform.system() + " " + platform.release())
 print("")
 
 if os.name == "posix": # Because the keyboard library requires su on Unix, this code checks   
-    if isAdmin(): # Prints warning.
-        print(colored("You are running this application on a Unix device. Some things may not work properly.","yellow"))
-        print("")
-    else: # Prints error and exits.
+    if not isAdmin():
         print(colored("You are running this application on a Unix device without su privileges. Please run this application with su.","red"))
         exit()
 
@@ -237,7 +233,7 @@ options = """ _________                                                         
 |    _\   |  |        ___   ___  _|_  __  ___    __ _|_   ___   __  |   /_|   |  |___    ___   __  ___   ___  _|_    |___|   |   | \  |
 |   \__   |  |       |   | |   |  |  |   |   |  |    |   |   | |    |     |   |  |      |   | |   |   | |   |  |     |       |   |  \ |
 |_________|  |______ |___| |   |  |  |   |___|\ |__  |   |___| |    |_________|  |      |___| |   |___| |___|  |     |     __|__ |   \|
-                    (or visited before)                                                                  ___/"""
+                    (or visited before)                                                            ___/"""
 
 # Visitor module
 def Visitor():
@@ -254,7 +250,7 @@ def Visitor():
     phone = NumberToCheck
     if reset == True:
         searchfile = open("database.txt", "r")
-        linenum = 1
+        linenum = 0
         found = False
         for line in searchfile:
             linenum = linenum + 1
@@ -262,6 +258,7 @@ def Visitor():
                 found = True
                 print("Your entry " + str(name) + " with phone number 0" + str(phone) + " will be reset. Confirm? (y/n)")
                 searchfile.close
+                break
 
         if found == False:
             print(colored("Your entry could not be found or verified.","red"))
@@ -271,13 +268,14 @@ def Visitor():
 
     else:
         searchfile = open("database.txt", "r")
-        linenum = 1
+        linenum = 0
         found = False
         for line in searchfile:
             linenum = linenum + 1
             if ("," + str(phone)) in line:
                 found = True
                 searchfile.close
+                break
 
         if found == True:
             print(colored("It seems that phone number is registered onto someone else.\nPlease contact Admin if you think this is a mistake.","red"))
@@ -333,7 +331,7 @@ def Contractor():
     global userinput
     NumCheck("Enter your phone number.")
     searchfile = open("database.txt", "r")
-    linenum = 1
+    linenum = 0
     for line in searchfile:
         linenum = linenum + 1
         if str(NumberToCheck) in line:
@@ -413,6 +411,7 @@ def UI():
     while True:
         try:
             if keyboard.is_pressed('1'):
+                reset = False
                 Visitor()
             if keyboard.is_pressed('2'):
                 Contractor()

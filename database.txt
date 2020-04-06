@@ -1,4 +1,0 @@
-Name,Phone,PIN,Sign-in status,Timestamp
-1,123456789,1111,True,28 Mar 2020 17:23:37 
-2,234567890,2222,False,28 Mar 2020 17:32:29
-3,345678901,3333,True,28 Mar 2020 17:24:35 
